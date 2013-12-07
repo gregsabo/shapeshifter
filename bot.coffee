@@ -3,18 +3,22 @@ Twit = require("twit")
 express = require("express")
 _ = require("underscore")
 T = new Twit(require("./config.js"))
+config = require("./config.js")
 request = require('request')
 
 
 chunks = []
-fs.readFile('shapes.txt', 'utf8', (err, data) ->
+request.get(config.art_url, (err, data) ->
     if err
         console.log "error reading file", err
         return
 
-    
-    broken = breakUp(data)
+    broken = breakUp(data.body)
+    broken.reverse()
     postOne(broken)
+    setInterval( ->
+        postOne(broken)
+    , (1000 * 60))
 )
 
 breakUp = (data) ->
@@ -25,8 +29,6 @@ breakUp = (data) ->
         tweetStart = cursor
 
         while true
-            console.log 'cursor', cursor
-
             if cursor > data.length - 1
                 tweets.push data.substr tweetStart
                 return
@@ -48,7 +50,6 @@ offset = 0
 startTime = 1386384911051
 getIndex = ->
     Math.floor((new Date().getTime() - startTime) / 60000)
-console.log "Index is", getIndex()
 
 
 postOne = (lines) ->
@@ -60,6 +61,3 @@ postOne = (lines) ->
         console.log "posted status", reply
     )
 
-#postOne()
-
-#setInterval postOne, (1000 * 60)
