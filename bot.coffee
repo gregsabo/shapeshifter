@@ -15,6 +15,7 @@ request.get(config.art_url, (err, data) ->
 
     broken = breakUp(data.body)
     broken.reverse()
+    
     postOne(broken)
     setInterval( ->
         postOne(broken)
